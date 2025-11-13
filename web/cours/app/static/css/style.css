@@ -1,0 +1,88 @@
+body{
+    background: linear-gradient(to bottom,rgb(138, 255, 138),rgb(231, 192, 198));
+    
+    
+}
+table{
+    background-color: transparent;
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 20px;
+    min-width: 500px ;
+    
+    
+
+}
+iframe{
+    border-radius: 10px;
+    border: none;
+}
+th, td {
+    border: 1px solid black; 
+    padding: 10px; 
+    border-radius: 10px;
+    background-color: whitesmoke;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+#titre{
+  text-align: center; 
+  font-size: 50px; 
+}
+body{
+    overflow: hidden;
+}
+
+.button{
+width: 300px;
+height: 100px;
+background: linear-gradient(to bottom,rgb(138, 255, 138),rgb(231, 192, 198));
+border: 1;
+border-radius: 10px;
+margin-bottom: 50px;
+position: relative;
+top: 100px;
+
+
+
+}
+.button1{
+width: 300px;
+height: 100px;
+background: linear-gradient(to bottom,beige,rgb(255, 255, 138));
+border: 1;
+border-radius: 10px;
+position: relative;
+top: 50px;
+right: 20px;
+
+
+}
+a{
+position: relative;
+bottom: 28px;
+left: 25px;
+text-decoration: none;
+color: black;
+
+}
+.button:hover{
+transform: scale(1.1);
+}
+.button1:hover{
+transform: scale(1.1);
+}
+p[align="center"]{
+    position: relative;
+    top: 25px;
+}
+#contact:focus ~ #txt {
+    visibility: visible;
+}
+
+#txt {
+    visibility: hidden;
+}
+footer{
+    position: relative;
+    bottom: 20px;
+}

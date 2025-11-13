@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<h1>Capitales retirées</h1>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Pays</th>
+            <th>Capitale</th>
+        </tr>
+        {% for nom in supprimes %}
+        <tr>
+            <td>{{ nom[0] }}</td>
+            <td>{{ nom[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</html>

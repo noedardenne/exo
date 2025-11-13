@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cookie Clicker Pro Réel</title>
+<style>
+body{
+  background:#f0e3c2;
+  font-family:Arial, sans-serif;
+  margin:0;
+  padding:0;
+  display:flex;
+  justify-content:center;
+}
+.container{
+  display:flex;
+  max-width:1200px;
+  margin-top:20px;
+  gap:20px;
+}
+/* Partie gauche */
+.left-panel{
+  flex:1;
+  background:#fff3d1;
+  border-radius:10px;
+  padding:20px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+#cookie{
+  width:250px;
+  height:250px;
+  background: radial-gradient(circle at 30% 30%, #ffe3b8 0%, #f6c975 35%, #e59c3f 100%);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:20px auto;
+  position:relative;
+  cursor:pointer;
+  box-shadow: inset -10px -8px 20px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2);
+}
+.chip{
+  width:20px;height:12px;background:#b36b20;border-radius:4px;position:absolute;
+}
+.chip.c1{ top:40px; left:50px; transform:rotate(-15deg);}
+.chip.c2{ top:70px; left:130px; transform:rotate(10deg);}
+.chip.c3{ top:140px; left:70px; transform:rotate(-25deg);}
+.chip.c4{ top:100px; right:40px; transform:rotate(5deg);}
+#stats{ text-align:center; font-weight:bold; font-size:18px; margin-top:10px; }
+.click-effect{
+  position:absolute;
+  font-weight:800;
+  color:#c36111;
+  pointer-events:none;
+  animation:floatUp 800ms ease forwards;
+}
+@keyframes floatUp{
+  0%{transform:translateY(0) scale(1);opacity:1;}
+  100%{transform:translateY(-70px) scale(1.2);opacity:0;}
+}
+/* Partie droite */
+.right-panel{
+  width:350px;
+  background:#fff9e3;
+  border-radius:10px;
+  padding:15px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+.right-panel h3{margin-top:0;text-align:center;}
+.upgrades-list{display:flex; flex-direction:column; gap:10px; max-height:600px; overflow-y:auto;}
+.upgrade{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#ffeabf;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #f0d9a5;
+}
+.upgrade button{
+  background:#d87f2a;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;
+}
+.upgrade button:disabled{background:#e2a67a;cursor:not-allowed;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="left-panel">
+    <div id="cookie">
+      <div class="chip c1"></div>
+      <div class="chip c2"></div>
+      <div class="chip c3"></div>
+      <div class="chip c4"></div>
+    </div>
+    <div id="stats">Cookies: 0 | CPS: 0 | CPC: 1</div>
+  </div>
+  <div class="right-panel">
+    <h3>Magasin</h3>
+    <div class="upgrades-list" id="upgrades"></div>
+  </div>
+</div>
+
+<script>
+const COOKIE_KEY='cookie_clicker_realistic';
+
+let state={
+  cookies:0,
+  totalCookies:0,
+  perClick:1,
+  cps:0,
+  upgrades:{
+    cursor:{name:"Curseur", baseCost:15, cost:15, qty:0, cps:0.1},
+    grandma:{name:"Grand-mère", baseCost:100, cost:100, qty:0, cps:1},
+    farm:{name:"Ferme", baseCost:1100, cost:1100, qty:0, cps:8},
+    factory:{name:"Usine", baseCost:12000, cost:12000, qty:0, cps:47},
+    mine:{name:"Mine", baseCost:130000, cost:130000, qty:0, cps:260},
+    bank:{name:"Banque", baseCost:1400000, cost:1400000, qty:0, cps:1400},
+    lab:{name:"Laboratoire", baseCost:20000000, cost:20000000, qty:0, cps:7800}
+  },
+  prestige:0
+};
+
+function format(n){
+  if(n>=1e12) return (n/1e12).toFixed(2)+'T';
+  if(n>=1e9) return (n/1e9).toFixed(2)+'G';
+  if(n>=1e6) return (n/1e6).toFixed(2)+'M';
+  if(n>=1e3) return (n/1e3).toFixed(2)+'k';
+  return Math.round(n*100)/100;
+}
+
+const cookieEl=document.getElementById('cookie');
+const statsEl=document.getElementById('stats');
+const upgradesContainer=document.getElementById('upgrades');
+
+function updateUI(){
+  statsEl.textContent=`Cookies: ${format(state.cookies)} | CPS: ${format(state.cps)} | CPC: ${format(state.perClick)}`;
+  upgradesContainer.innerHTML='';
+  for(const key in state.upgrades){
+    const up=state.upgrades[key];
+    const div=document.createElement('div');
+    div.className='upgrade';
+    div.innerHTML=`<span>${up.name} (x${up.qty}) - ${format(up.cps)} CPS</span><button ${state.cookies<up.cost?'disabled':''} data-key="${key}">Acheter (${format(up.cost)})</button>`;
+    div.querySelector('button').addEventListener('click',()=>buyUpgrade(key));
+    upgradesContainer.appendChild(div);
+  }
+}
+
+function recalcCPS(){
+  let total=0;
+  for(const k in state.upgrades) total+=state.upgrades[k].qty*state.upgrades[k].cps;
+  state.cps=total*(1+state.prestige*0.2);
+}
+
+function buyUpgrade(key){
+  const up=state.upgrades[key];
+  if(state.cookies<up.cost) return;
+  state.cookies-=up.cost;
+  up.qty+=1;
+  up.cost=Math.ceil(up.baseCost*Math.pow(1.15,up.qty));
+  recalcCPS();
+  showClickEffect('+0');
+  updateUI();
+  save();
+}
+
+function clickCookie(){
+  state.cookies+=state.perClick*(1+state.prestige*0.2);
+  state.totalCookies+=state.perClick;
+  updateUI();
+  showClickEffect('+'+format(state.perClick));
+}
+
+function showClickEffect(text){
+  const el=document.createElement('div');
+  el.className='click-effect';
+  el.style.left=(Math.random()*100)+'%';
+  el.style.top=(Math.random()*100)+'%';
+  el.textContent=text;
+  cookieEl.appendChild(el);
+  setTimeout(()=>cookieEl.removeChild(el),800);
+}
+
+cookieEl.addEventListener('click',clickCookie);
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();clickCookie();}});
+
+function tick(){ clickCookie(state.cps/10); }
+setInterval(tick,100);
+
+function save(){ localStorage.setItem(COOKIE_KEY,JSON.stringify(state)); }
+function load(){ 
+  const raw=localStorage.getItem(COOKIE_KEY);
+  if(!raw) return;
+  try{ Object.assign(state,JSON.parse(raw)); recalcCPS(); updateUI(); }catch(e){}
+}
+setInterval(save,1000);
+
+load();
+updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bonjour</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>👋 {{ pays }} - {{ capitale }} !</h1>
+    <p>Bienvenue sur mon site 😄</p>
+
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Pays</th>
+            <th>Capitale</th>
+        </tr>
+        {% for nom in noms %}
+        <tr>
+            <td>{{ nom[0] }}</td>
+            <td>{{ nom[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
